@@ -5,20 +5,11 @@ import plugin from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    base: process.env.NODE_ENV === 'production' ? '/web-gestor-106/' : '/',
+    base: '/web-gestor-106/',
     plugins: [plugin()],
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
-    },
-    server: {
-        proxy: {
-            '^/api': {
-                target: 'https://localhost:7210/',
-                secure: false
-            }
-        },
-        port: 5173
     }
 })
