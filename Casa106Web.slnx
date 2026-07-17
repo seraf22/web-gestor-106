@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Casa106Web/casa106web.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
