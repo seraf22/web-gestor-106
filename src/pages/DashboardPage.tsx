@@ -101,21 +101,21 @@ export function DashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* Filtro por Mes */}
-      <div className="bg-white rounded-lg shadow-md p-4 flex items-center gap-4">
-        <Calendar className="text-casa-blue" size={24} />
+      <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+        <Calendar className="text-casa-blue flex-shrink-0" size={20} />
         <input
           type="month"
           value={mes}
           onChange={(e) => setMes(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+          className="w-full sm:w-auto px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
         />
-        <span className="text-gray-600 text-sm">Filtrando por mes</span>
+        <span className="text-gray-600 text-xs lg:text-sm">Filtrando por mes</span>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6">
         <StatCard
           title="Ingresos"
           value={stats.ingresos.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 })}
@@ -137,7 +137,7 @@ export function DashboardPage() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         <Chart data={datosGrafico} title="Ingresos vs Egresos" type="bar" />
         {datosCategories.length > 0 && (
           <Chart data={datosCategories} title="Distribución por Categoría" type="pie" />

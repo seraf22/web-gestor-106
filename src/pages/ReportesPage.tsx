@@ -112,79 +112,79 @@ export function ReportesPage() {
   const COLORS = ['#1e40af', '#16a34a', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
   if (loading) {
-    return <div className="text-center py-8">Cargando...</div>;
+    return <div className="text-center py-8 text-sm lg:text-base">Cargando...</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold text-gray-900">Reportes Financieros</h2>
+    <div className="space-y-4 lg:space-y-6">
+      <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Reportes Financieros</h2>
 
       {/* Filtro de fecha */}
-      <div className="bg-white rounded-lg shadow-md p-4 flex flex-wrap gap-4 items-end">
-        <div>
-          <label className="text-sm font-medium text-gray-700 block mb-2">
+      <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 flex flex-col sm:flex-row flex-wrap gap-2 lg:gap-4 items-start sm:items-end">
+        <div className="w-full sm:w-auto">
+          <label className="text-xs lg:text-sm font-medium text-gray-700 block mb-2">
             Desde:
           </label>
           <input
             type="month"
             value={mesInicio}
             onChange={(e) => setMesInicio(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full sm:w-auto px-3 lg:px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
           />
         </div>
-        <div>
-          <label className="text-sm font-medium text-gray-700 block mb-2">
+        <div className="w-full sm:w-auto">
+          <label className="text-xs lg:text-sm font-medium text-gray-700 block mb-2">
             Hasta:
           </label>
           <input
             type="month"
             value={mesFin}
             onChange={(e) => setMesFin(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full sm:w-auto px-3 lg:px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
           />
         </div>
-        <button className="flex items-center gap-2 bg-casa-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-casa-blue text-white px-3 lg:px-4 py-2 rounded-lg hover:bg-blue-700 text-sm lg:text-base">
           <Download size={18} />
           Descargar PDF
         </button>
       </div>
 
       {/* Resumen de estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-green-600">
-          <p className="text-gray-600 text-sm mb-1">Total Ingresos</p>
-          <p className="text-2xl font-bold text-green-600">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+        <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 border-l-4 border-green-600">
+          <p className="text-gray-600 text-xs lg:text-sm mb-1">Total Ingresos</p>
+          <p className="text-lg lg:text-2xl font-bold text-green-600">
             {totalIngresos.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 })}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-red-600">
-          <p className="text-gray-600 text-sm mb-1">Total Egresos</p>
-          <p className="text-2xl font-bold text-red-600">
+        <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 border-l-4 border-red-600">
+          <p className="text-gray-600 text-xs lg:text-sm mb-1">Total Egresos</p>
+          <p className="text-lg lg:text-2xl font-bold text-red-600">
             {totalEgresos.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 })}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-casa-blue">
-          <p className="text-gray-600 text-sm mb-1">Saldo</p>
-          <p className={`text-2xl font-bold ${saldo >= 0 ? 'text-casa-blue' : 'text-red-600'}`}>
+        <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 border-l-4 border-casa-blue">
+          <p className="text-gray-600 text-xs lg:text-sm mb-1">Saldo</p>
+          <p className={`text-lg lg:text-2xl font-bold ${saldo >= 0 ? 'text-casa-blue' : 'text-red-600'}`}>
             {saldo.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 })}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-amber-600">
-          <p className="text-gray-600 text-sm mb-1">Margen</p>
-          <p className="text-2xl font-bold text-amber-600">{margenGanancia}%</p>
+        <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 border-l-4 border-amber-600">
+          <p className="text-gray-600 text-xs lg:text-sm mb-1">Margen</p>
+          <p className="text-lg lg:text-2xl font-bold text-amber-600">{margenGanancia}%</p>
         </div>
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* Gráfico de barras por mes */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Ingresos vs Egresos por Mes</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+          <h3 className="text-sm lg:text-lg font-semibold mb-3 lg:mb-4 text-gray-900">Ingresos vs Egresos por Mes</h3>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={dataPorMes}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="mes" />
-              <YAxis />
+              <XAxis dataKey="mes" fontSize={11} />
+              <YAxis fontSize={11} />
               <Tooltip />
               <Legend />
               <Bar dataKey="ingresos" fill="#16a34a" name="Ingresos" />
@@ -194,9 +194,9 @@ export function ReportesPage() {
         </div>
 
         {/* Gráfico de pastel por categoría */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Distribución por Categoría</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+          <h3 className="text-sm lg:text-lg font-semibold mb-3 lg:mb-4 text-gray-900">Distribución por Categoría</h3>
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
                 data={dataPorCategoria}
@@ -204,7 +204,7 @@ export function ReportesPage() {
                 cy="50%"
                 labelLine={false}
                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
+                outerRadius={60}
                 fill="#8884d8"
                 dataKey="value"
               >
@@ -219,28 +219,28 @@ export function ReportesPage() {
       </div>
 
       {/* Tabla de resumen por categoría */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">Detalle por Categoría</h3>
+      <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+        <h3 className="text-sm lg:text-lg font-semibold mb-3 lg:mb-4 text-gray-900">Detalle por Categoría</h3>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-xs lg:text-sm">
             <thead className="bg-gray-100 border-b">
               <tr>
-                <th className="text-left py-3 px-4 font-semibold">Categoría</th>
-                <th className="text-right py-3 px-4 font-semibold">Monto</th>
-                <th className="text-right py-3 px-4 font-semibold">% del Total</th>
+                <th className="text-left py-2 lg:py-3 px-2 lg:px-4 font-semibold">Categoría</th>
+                <th className="text-right py-2 lg:py-3 px-2 lg:px-4 font-semibold">Monto</th>
+                <th className="text-right py-2 lg:py-3 px-2 lg:px-4 font-semibold">% del Total</th>
               </tr>
             </thead>
             <tbody>
               {dataPorCategoria.map((cat: any, idx: number) => (
                 <tr key={idx} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-4">
+                  <td className="py-2 lg:py-3 px-2 lg:px-4">
                     <span className="inline-block w-3 h-3 mr-2 rounded" style={{ backgroundColor: COLORS[idx % COLORS.length] }}></span>
                     {cat.name}
                   </td>
-                  <td className="py-3 px-4 text-right font-semibold">
+                  <td className="py-2 lg:py-3 px-2 lg:px-4 text-right font-semibold">
                     {cat.value.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 })}
                   </td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-2 lg:py-3 px-2 lg:px-4 text-right">
                     {((cat.value / (totalIngresos + totalEgresos)) * 100).toFixed(2)}%
                   </td>
                 </tr>

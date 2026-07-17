@@ -95,30 +95,30 @@ export function NuevoMovimientoPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-gray-900">Nuevo Movimiento</h2>
+    <div className="w-full max-w-2xl mx-auto px-4 lg:px-0">
+      <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 text-gray-900">Nuevo Movimiento</h2>
 
       {mensaje && (
         <div
-          className={`mb-6 p-4 rounded-lg flex gap-3 ${
+          className={`mb-4 lg:mb-6 p-3 lg:p-4 rounded-lg flex gap-2 lg:gap-3 text-sm lg:text-base ${
             mensaje.tipo === 'exito'
               ? 'bg-green-50 border border-green-200 text-green-800'
               : 'bg-red-50 border border-red-200 text-red-800'
           }`}
         >
           {mensaje.tipo === 'exito' ? (
-            <CheckCircle size={20} />
+            <CheckCircle size={20} className="flex-shrink-0" />
           ) : (
-            <AlertCircle size={20} />
+            <AlertCircle size={20} className="flex-shrink-0" />
           )}
           <span>{mensaje.texto}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Tipo */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
             Tipo de Movimiento *
           </label>
           <select
@@ -130,7 +130,7 @@ export function NuevoMovimientoPage() {
                 categoriaId: '',
               })
             }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
           >
             <option value="Ingreso">Ingreso</option>
             <option value="Egreso">Egreso</option>
@@ -139,13 +139,13 @@ export function NuevoMovimientoPage() {
 
         {/* Categoría */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
             Categoría *
           </label>
           <select
             value={formData.categoriaId}
             onChange={(e) => setFormData({ ...formData, categoriaId: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
           >
             <option value="">Selecciona una categoría</option>
             {categoriasDelTipo.map((cat) => (
@@ -158,21 +158,21 @@ export function NuevoMovimientoPage() {
 
         {/* Descripción */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
             Descripción *
           </label>
           <input
             type="text"
             value={formData.descripcion}
             onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
             placeholder="Ej: Arriendo mes de julio"
           />
         </div>
 
         {/* Monto */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
             Monto *
           </label>
           <input
@@ -180,74 +180,74 @@ export function NuevoMovimientoPage() {
             step="0.01"
             value={formData.monto}
             onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
             placeholder="0.00"
           />
         </div>
 
         {/* Fecha */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
             Fecha del Movimiento
           </label>
           <input
             type="date"
             value={formData.fechaMovimiento}
             onChange={(e) => setFormData({ ...formData, fechaMovimiento: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
           />
         </div>
 
         {/* Proveedor */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
             Proveedor (Opcional)
           </label>
           <input
             type="text"
             value={formData.proveedor}
             onChange={(e) => setFormData({ ...formData, proveedor: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
             placeholder="Ej: Airbnb, Banco, etc."
           />
         </div>
 
         {/* Método de Pago */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
             Método de Pago (Opcional)
           </label>
           <input
             type="text"
             value={formData.metodoPago}
             onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
             placeholder="Ej: Transferencia, Efectivo, Tarjeta"
           />
         </div>
 
         {/* Período */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
               Período Desde (Opcional)
             </label>
             <input
               type="date"
               value={formData.periodoDesde}
               onChange={(e) => setFormData({ ...formData, periodoDesde: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+              className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs lg:text-sm font-medium text-gray-700 mb-2">
               Período Hasta (Opcional)
             </label>
             <input
               type="date"
               value={formData.periodoHasta}
               onChange={(e) => setFormData({ ...formData, periodoHasta: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+              className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
             />
           </div>
         </div>
@@ -255,7 +255,7 @@ export function NuevoMovimientoPage() {
         {/* Botón */}
         <button
           type="submit"
-          className="w-full bg-casa-blue text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+          className="w-full bg-casa-blue text-white font-semibold py-2 lg:py-3 px-4 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 text-sm lg:text-base"
         >
           <Save size={20} />
           Guardar Movimiento

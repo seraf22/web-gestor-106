@@ -71,13 +71,13 @@ export function MovimientosPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold text-gray-900">Movimientos</h2>
+    <div className="space-y-4 lg:space-y-6">
+      <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Movimientos</h2>
 
       {/* Filtro */}
-      <div className="bg-white rounded-lg shadow-md p-4 flex gap-4">
-        <div>
-          <label className="text-sm font-medium text-gray-700 block mb-2">
+      <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 flex flex-col sm:flex-row gap-3 lg:gap-4">
+        <div className="w-full sm:w-auto">
+          <label className="text-xs lg:text-sm font-medium text-gray-700 block mb-2">
             Filtrar por tipo:
           </label>
           <select
@@ -86,7 +86,7 @@ export function MovimientosPage() {
               setFiltroTipo(e.target.value);
               setPage(1);
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-casa-blue"
           >
             <option value="Todos">Todos</option>
             <option value="Ingreso">Ingresos</option>
@@ -97,32 +97,32 @@ export function MovimientosPage() {
 
       {/* Tabla */}
       {loading ? (
-        <div className="text-center py-8 text-gray-600">Cargando...</div>
+        <div className="text-center py-8 text-gray-600 text-sm lg:text-base">Cargando...</div>
       ) : error ? (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm lg:text-base">
           {error}
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="hidden lg:block overflow-x-auto">
+            <table className="w-full text-sm">
               <thead className="bg-gray-100 border-b border-gray-200">
                 <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Fecha</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Tipo</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Categoría</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Descripción</th>
-                  <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Acciones</th>
+                  <th className="text-left py-3 px-3 lg:px-4 font-semibold text-gray-700">Fecha</th>
+                  <th className="text-left py-3 px-3 lg:px-4 font-semibold text-gray-700">Tipo</th>
+                  <th className="text-left py-3 px-3 lg:px-4 font-semibold text-gray-700">Categoría</th>
+                  <th className="text-left py-3 px-3 lg:px-4 font-semibold text-gray-700">Descripción</th>
+                  <th className="text-right py-3 px-3 lg:px-4 font-semibold text-gray-700">Monto</th>
+                  <th className="text-center py-3 px-3 lg:px-4 font-semibold text-gray-700">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {movimientos.map((mov) => (
                   <tr key={mov.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-3 lg:px-4">
                       {new Date(mov.fechaMovimiento).toLocaleDateString('es-CL')}
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-3 lg:px-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
                           mov.tipo === 'Ingreso'
@@ -133,9 +133,9 @@ export function MovimientosPage() {
                         {mov.tipo}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-600">{mov.categoriaNombre || '-'}</td>
-                    <td className="py-3 px-4 text-gray-600">{mov.descripcion}</td>
-                    <td className="py-3 px-4 text-right font-semibold">
+                    <td className="py-3 px-3 lg:px-4 text-gray-600">{mov.categoriaNombre || '-'}</td>
+                    <td className="py-3 px-3 lg:px-4 text-gray-600">{mov.descripcion}</td>
+                    <td className="py-3 px-3 lg:px-4 text-right font-semibold">
                       <span
                         className={mov.tipo === 'Ingreso' ? 'text-green-600' : 'text-red-600'}
                       >
@@ -146,10 +146,10 @@ export function MovimientosPage() {
                         })}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-3 px-3 lg:px-4 text-center">
                       <button
                         onClick={() => handleDelete(mov.id)}
-                        className="inline-flex items-center gap-1 text-red-600 hover:text-red-800"
+                        className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 p-1"
                         title="Eliminar"
                       >
                         <Trash2 size={16} />
@@ -161,25 +161,66 @@ export function MovimientosPage() {
             </table>
           </div>
 
+          {/* Mobile View - Cards */}
+          <div className="lg:hidden space-y-3 p-3 lg:p-4">
+            {movimientos.map((mov) => (
+              <div key={mov.id} className="border border-gray-200 rounded-lg p-3 space-y-2 hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-xs text-gray-500">
+                      {new Date(mov.fechaMovimiento).toLocaleDateString('es-CL')}
+                    </p>
+                    <p className="text-sm font-medium text-gray-900 mt-1">{mov.descripcion}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ml-2 ${
+                    mov.tipo === 'Ingreso'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {mov.tipo}
+                  </span>
+                </div>
+                <div className="flex justify-between items-end">
+                  <p className="text-xs text-gray-600">{mov.categoriaNombre ?? '-'}</p>
+                  <p className={`text-sm font-semibold ${
+                    mov.tipo === 'Ingreso' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {mov.monto.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}
+                  </p>
+                </div>
+                <div className="flex justify-end pt-2 border-t border-gray-100">
+                  <button
+                    onClick={() => handleDelete(mov.id)}
+                    className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 p-1 text-sm"
+                    title="Eliminar"
+                  >
+                    <Trash2 size={16} />
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Paginación */}
-          <div className="px-4 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+          <div className="px-3 lg:px-4 py-3 lg:py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-2 flex-wrap">
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+              className="flex items-center gap-1 px-2 lg:px-3 py-2 text-sm rounded-lg hover:bg-gray-200 disabled:opacity-50"
             >
               <ChevronLeft size={18} />
               Anterior
             </button>
 
-            <span className="text-sm text-gray-600">
-              Página {page} de {totalPages}
+            <span className="text-xs lg:text-sm text-gray-600">
+              Pág {page} de {totalPages}
             </span>
 
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+              className="flex items-center gap-1 px-2 lg:px-3 py-2 text-sm rounded-lg hover:bg-gray-200 disabled:opacity-50"
             >
               Siguiente
               <ChevronRight size={18} />
