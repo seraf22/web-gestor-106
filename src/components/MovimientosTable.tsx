@@ -18,7 +18,7 @@ function parsePeriodoDate(mov: Movimiento): Date {
     if (m) {
       const y = Number(m[1]);
       const mo = Number(m[2]);
-      const d = m[3] ? Number(m[3]) : 12; // use mid-month default to avoid timezone shifts
+      const d = 12; // always use mid-month to avoid timezone shifts even if day is 01
       if (!isNaN(y) && !isNaN(mo)) return new Date(Date.UTC(y, mo - 1, d));
     }
     const parsed = new Date(p);
@@ -72,7 +72,7 @@ export function MovimientosTable({ movimientos, loading, error }: MovimientosTab
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-xs text-gray-500">{new Date(movimiento.fechaMovimiento).toLocaleDateString('es-CL')}</p>
-                    <p className="text-xs text-gray-500">Devengo: {parsePeriodoDate(movimiento).toLocaleDateString('es-CL', { year: 'numeric', month: 'short' })}</p>
+                    <p className="text-xs text-gray-500">Devengo: {new Intl.DateTimeFormat('es-CL', { year: 'numeric', month: 'short', timeZone: 'UTC' }).format(parsePeriodoDate(movimiento))}</p>
                     <p className="text-sm font-medium text-gray-900 mt-1">{movimiento.descripcion ?? '-'}</p>
                   </div>
                   <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ml-2 ${
@@ -112,7 +112,7 @@ export function MovimientosTable({ movimientos, loading, error }: MovimientosTab
                   <tr key={movimiento.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4 text-gray-600 text-sm">
                       <div className="text-sm">{new Date(movimiento.fechaMovimiento).toLocaleDateString('es-CL')}</div>
-                      <div className="text-xs text-gray-500">Devengo: {parsePeriodoDate(movimiento).toLocaleDateString('es-CL', { year: 'numeric', month: 'short' })}</div>
+                      <div className="text-xs text-gray-500">Devengo: {new Intl.DateTimeFormat('es-CL', { year: 'numeric', month: 'short', timeZone: 'UTC' }).format(parsePeriodoDate(movimiento))}</div>
                     </td>
                     <td className="py-3 px-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${

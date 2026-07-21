@@ -22,7 +22,7 @@ function parsePeriodoDate(mov: Movimiento): Date {
     if (m) {
       const y = Number(m[1]);
       const mo = Number(m[2]);
-      const d = m[3] ? Number(m[3]) : 12; // use mid-month default to avoid timezone shifts
+      const d = 12; // always use mid-month to avoid timezone shifts even if day is 01
       if (!isNaN(y) && !isNaN(mo)) return new Date(Date.UTC(y, mo - 1, d));
     }
     const parsed = new Date(p);
