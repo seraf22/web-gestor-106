@@ -1,14 +1,51 @@
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Download, Calendar } from 'lucide-react';
-import { apiUrl } from '../config';
+import { Chart } from '../components/Chart';
+import { apiUrl, authHeaders } from '../config';
 
 interface Movimiento {
   id: string;
   fechaMovimiento: string;
+  periodoDesde?: any;
+  periodoHasta?: any;
   tipo: string;
   categoriaNombre?: string;
   monto: number;
+}
+
+function parsePeriodoDate(mov: Movimiento): Date {
+  // Prefer mesDevengo, then periodoHasta, then fechaMovimiento
+  const p = (mov as any).mesDevengo ?? mov.periodoHasta ?? mov.fechaMovimiento;
+  if (!p) return new Date(0);
+  if (typeof p === 'string') {
+    // Prefer parsing YYYY-MM or YYYY-MM-DD manually to avoid timezone shifts from Date(string)
+    const m = p.match(/^(\d{4})-(\d{2})(?:-(\d{2}))?$/);
+    if (m) {
+      const y = Number(m[1]);
+      const mo = Number(m[2]);
+      const d = m[3] ? Number(m[3]) : 1;
+      if (!isNaN(y) && !isNaN(mo)) return new Date(y, mo - 1, d);
+    }
+    const parsed = new Date(p);
+    if (!isNaN(parsed.getTime())) return parsed;
+    const parts = p.split('-');
+    if (parts.length >= 2) {
+      const y = parseInt(parts[0], 10);
+      const mm = parseInt(parts[1], 10);
+      if (!isNaN(y) && !isNaN(mm)) return new Date(y, mm - 1, 1);
+    }
+    return new Date(p);
+  }
+  if (typeof p === 'object') {
+    const y = p.year ?? p.año ?? p.year;
+    const m = p.month ?? p.mes ?? p.month;
+    const d = p.day ?? p.día ?? p.day ?? 1;
+    if (y !== undefined && m !== undefined) {
+      return new Date(Date.UTC(Number(y), Number(m) - 1, Number(d || 12)));
+    }
+  }
+  return new Date(0);
 }
 
 interface PaginatedResponse<T> {
@@ -38,7 +75,9 @@ export function ReportesPage() {
   async function loadMovimientos() {
     setLoading(true);
     try {
-      const response = await fetch(apiUrl('/api/movimientos?page=1&pageSize=500'));
+      const response = await fetch(apiUrl('/api/movimientos?page=1&pageSize=500'), {
+        headers: authHeaders(),
+      });
       if (!response.ok) throw new Error('Error al cargar movimientos');
 
       const data: PaginatedResponse<Movimiento> = await response.json();
@@ -51,7 +90,7 @@ export function ReportesPage() {
       const fechaFin = new Date(parseInt(yearFin), parseInt(monthFin), 0);
 
       items = items.filter((mov) => {
-        const fecha = new Date(mov.fechaMovimiento);
+        const fecha = parsePeriodoDate(mov);
         return fecha >= fechaInicio && fecha <= fechaFin;
       });
 
@@ -63,12 +102,65 @@ export function ReportesPage() {
     }
   }
 
+  // Helper para formatear mes de devengo evitando shifts por zona horaria
+  function formatDevengoMonth(mov: Movimiento) {
+    const p = (mov as any).mesDevengo ?? mov.periodoHasta ?? mov.fechaMovimiento;
+    if (!p) return '';
+    let y: number | undefined;
+    let mo: number | undefined;
+    let d = 1;
+    if (typeof p === 'string') {
+      const m = p.match(/^(\d{4})-(\d{2})(?:-(\d{2}))?/);
+      if (m) {
+        y = Number(m[1]);
+        mo = Number(m[2]);
+        d = m[3] ? Number(m[3]) : 1;
+      } else {
+        const dt = new Date(p);
+        if (!isNaN(dt.getTime())) {
+          y = dt.getFullYear();
+          mo = dt.getMonth() + 1;
+          d = dt.getDate();
+        }
+      }
+    } else if (typeof p === 'object') {
+      y = Number((p as any).year ?? (p as any).año);
+      mo = Number((p as any).month ?? (p as any).mes);
+      d = Number((p as any).day ?? 1);
+    }
+    if (!y || !mo) return '';
+    return new Intl.DateTimeFormat('es-CL', { year: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(y, mo - 1, d)));
+  }
+
   // Preparar datos para gráficos
   const dataPorMes = movimientos.reduce((acc: any, mov) => {
-    const fecha = new Date(mov.fechaMovimiento);
-    const mes = fecha.toLocaleDateString('es-CL', { year: 'numeric', month: 'short' });
+    // usar key canonical YYYY-MM para agrupar sin depender de Date local
+    const p = (mov as any).mesDevengo ?? mov.periodoHasta ?? mov.fechaMovimiento;
+    let key = '';
+    let y: number | undefined;
+    let mo: number | undefined;
+    if (typeof p === 'string') {
+      const m = p.match(/^(\d{4})-(\d{2})/);
+      if (m) {
+        y = Number(m[1]);
+        mo = Number(m[2]);
+      } else {
+        const dt = new Date(p);
+        if (!isNaN(dt.getTime())) {
+          y = dt.getFullYear();
+          mo = dt.getMonth() + 1;
+        }
+      }
+    } else if (typeof p === 'object') {
+      y = Number((p as any).year ?? (p as any).año);
+      mo = Number((p as any).month ?? (p as any).mes);
+    }
+    if (y && mo) key = `${y}-${String(mo).padStart(2, '0')}`;
+    else key = 'other';
 
-    const existing = acc.find((m: any) => m.mes === mes);
+    const display = key === 'other' ? 'Otros' : new Intl.DateTimeFormat('es-CL', { year: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(Number(y), Number(mo) - 1, 1)));
+
+    const existing = acc.find((m: any) => m.key === key);
     if (existing) {
       if (mov.tipo === 'Ingreso') {
         existing.ingresos += mov.monto;
@@ -77,13 +169,14 @@ export function ReportesPage() {
       }
     } else {
       acc.push({
-        mes,
+        key,
+        mes: display,
         ingresos: mov.tipo === 'Ingreso' ? mov.monto : 0,
         egresos: mov.tipo === 'Egreso' ? mov.monto : 0,
       });
     }
     return acc;
-  }, []);
+  }, []).sort((a: any,b: any)=> a.key.localeCompare(b.key));
 
   const dataPorCategoria = movimientos.reduce((acc: any, mov) => {
     const existing = acc.find((c: any) => c.name === mov.categoriaNombre);
@@ -179,42 +272,12 @@ export function ReportesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* Gráfico de barras por mes */}
         <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
-          <h3 className="text-sm lg:text-lg font-semibold mb-3 lg:mb-4 text-gray-900">Ingresos vs Egresos por Mes</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={dataPorMes}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="mes" fontSize={11} />
-              <YAxis fontSize={11} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="ingresos" fill="#16a34a" name="Ingresos" />
-              <Bar dataKey="egresos" fill="#dc2626" name="Egresos" />
-            </BarChart>
-          </ResponsiveContainer>
+          <Chart data={dataPorMes.map((m:any)=>({ name: m.mes, ingresos: m.ingresos, egresos: m.egresos }))} title="Ingresos vs Egresos por Mes" type="bar" />
         </div>
 
         {/* Gráfico de pastel por categoría */}
         <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
-          <h3 className="text-sm lg:text-lg font-semibold mb-3 lg:mb-4 text-gray-900">Distribución por Categoría</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={dataPorCategoria}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={60}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {dataPorCategoria.map((_: any, index: number) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          <Chart data={dataPorCategoria.map((c:any)=>({ name: c.name, value: c.value }))} title="Distribución por Categoría" type="pie" />
         </div>
       </div>
 

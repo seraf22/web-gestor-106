@@ -1,14 +1,47 @@
 import { useEffect, useState } from 'react';
 import { Trash2, Edit2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { apiUrl } from '../config';
+import { apiUrl, authHeaders } from '../config';
 
 interface Movimiento {
   id: string;
   fechaMovimiento: string;
+  mesDevengo?: any;
+  periodoDesde?: any;
+  periodoHasta?: any;
   tipo: string;
   categoriaNombre?: string;
   descripcion?: string;
   monto: number;
+}
+
+function parsePeriodoDate(mov: Movimiento): Date {
+  const p = (mov as any).mesDevengo ?? mov.periodoHasta ?? mov.fechaMovimiento;
+  if (!p) return new Date(0);
+  if (typeof p === 'string') {
+    const m = p.match(/^(\\d{4})-(\\d{2})(?:-(\\d{2}))?$/);
+    if (m) {
+      const y = Number(m[1]);
+      const mo = Number(m[2]);
+      const d = m[3] ? Number(m[3]) : 1;
+      if (!isNaN(y) && !isNaN(mo)) return new Date(y, mo - 1, d);
+    }
+    const parsed = new Date(p);
+    if (!isNaN(parsed.getTime())) return parsed;
+    const parts = p.split('-');
+    if (parts.length >= 2) {
+      const y = parseInt(parts[0], 10);
+      const mm = parseInt(parts[1], 10);
+      if (!isNaN(y) && !isNaN(mm)) return new Date(y, mm - 1, 1);
+    }
+    return new Date(p);
+  }
+  if (typeof p === 'object') {
+    const y = p.year ?? p.año ?? p.year;
+    const m = p.month ?? p.mes ?? p.month;
+    const d = p.day ?? p.día ?? p.day ?? 1;
+    if (y !== undefined && m !== undefined) return new Date(Date.UTC(Number(y), Number(m) - 1, Number(d || 12)));
+  }
+  return new Date(0);
 }
 
 interface PaginatedResponse<T> {
@@ -33,7 +66,9 @@ export function MovimientosPage() {
   async function loadMovimientos() {
     setLoading(true);
     try {
-      const response = await fetch(apiUrl(`/api/movimientos?page=${page}&pageSize=20`));
+      const response = await fetch(apiUrl(`/api/movimientos?page=${page}&pageSize=20`), {
+        headers: authHeaders(),
+      });
       if (!response.ok) throw new Error('Error al cargar movimientos');
 
       const data: PaginatedResponse<Movimiento> = await response.json();
@@ -60,6 +95,7 @@ export function MovimientosPage() {
     try {
       const response = await fetch(apiUrl(`/api/movimientos/${id}`), {
         method: 'DELETE',
+        headers: authHeaders(),
       });
 
       if (!response.ok) throw new Error('Error al eliminar');

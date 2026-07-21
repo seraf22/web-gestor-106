@@ -1,10 +1,43 @@
 interface Movimiento {
   id: string;
   fechaMovimiento: string;
+  mesDevengo?: any;
+  periodoDesde?: any;
+  periodoHasta?: any;
   tipo: string;
   categoriaNombre?: string;
   descripcion?: string;
   monto: number;
+}
+
+function parsePeriodoDate(mov: Movimiento): Date {
+  const p = (mov as any).mesDevengo ?? mov.periodoHasta ?? mov.fechaMovimiento;
+  if (!p) return new Date(0);
+  if (typeof p === 'string') {
+    const m = p.match(/^(\\d{4})-(\\d{2})(?:-(\\d{2}))?$/);
+    if (m) {
+      const y = Number(m[1]);
+      const mo = Number(m[2]);
+      const d = m[3] ? Number(m[3]) : 1;
+      if (!isNaN(y) && !isNaN(mo)) return new Date(y, mo - 1, d);
+    }
+    const parsed = new Date(p);
+    if (!isNaN(parsed.getTime())) return parsed;
+    const parts = p.split('-');
+    if (parts.length >= 2) {
+      const y = parseInt(parts[0], 10);
+      const mm = parseInt(parts[1], 10);
+      if (!isNaN(y) && !isNaN(mm)) return new Date(y, mm - 1, 1);
+    }
+    return new Date(p);
+  }
+  if (typeof p === 'object') {
+    const y = p.year ?? p.año ?? p.year;
+    const m = p.month ?? p.mes ?? p.month;
+    const d = p.day ?? p.día ?? p.day ?? 1;
+    if (y !== undefined && m !== undefined) return new Date(Date.UTC(Number(y), Number(m) - 1, Number(d || 12)));
+  }
+  return new Date(0);
 }
 
 interface MovimientosTableProps {
@@ -38,9 +71,8 @@ export function MovimientosTable({ movimientos, loading, error }: MovimientosTab
               <div key={movimiento.id} className="border border-gray-200 rounded-lg p-4 space-y-2 hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-xs text-gray-500">
-                      {new Date(movimiento.fechaMovimiento).toLocaleDateString('es-CL')}
-                    </p>
+                    <p className="text-xs text-gray-500">{new Date(movimiento.fechaMovimiento).toLocaleDateString('es-CL')}</p>
+                    <p className="text-xs text-gray-500">Devengo: {parsePeriodoDate(movimiento).toLocaleDateString('es-CL', { year: 'numeric', month: 'short' })}</p>
                     <p className="text-sm font-medium text-gray-900 mt-1">{movimiento.descripcion ?? '-'}</p>
                   </div>
                   <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ml-2 ${
@@ -79,7 +111,8 @@ export function MovimientosTable({ movimientos, loading, error }: MovimientosTab
                 {movimientos.map((movimiento) => (
                   <tr key={movimiento.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4 text-gray-600 text-sm">
-                      {new Date(movimiento.fechaMovimiento).toLocaleDateString('es-CL')}
+                      <div className="text-sm">{new Date(movimiento.fechaMovimiento).toLocaleDateString('es-CL')}</div>
+                      <div className="text-xs text-gray-500">Devengo: {parsePeriodoDate(movimiento).toLocaleDateString('es-CL', { year: 'numeric', month: 'short' })}</div>
                     </td>
                     <td className="py-3 px-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${

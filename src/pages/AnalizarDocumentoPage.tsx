@@ -1,6 +1,8 @@
 import { useState } from 'react';
+// Usamos sessionStorage + window.location para evitar errores si no hay contexto de router
+
 import { Upload, CheckCircle, AlertCircle } from 'lucide-react';
-import { apiUrl } from '../config';
+import { apiUrl, authHeaders } from '../config';
 
 interface AnalysisResult {
   tipo?: string;
@@ -12,7 +14,7 @@ interface AnalysisResult {
   metodoPago?: string;
 }
 
-export function AnalizarDocumentoPage() {
+  export function AnalizarDocumentoPage() {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -51,6 +53,7 @@ export function AnalizarDocumentoPage() {
     try {
       const response = await fetch(apiUrl(`/api/analisis/documento?guardar=${guardar}`), {
         method: 'POST',
+        headers: authHeaders(),
         body: formData,
       });
 
@@ -72,6 +75,14 @@ export function AnalizarDocumentoPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleConfirmEdit() {
+    if (!resultado) return;
+    try {
+      sessionStorage.setItem('prefillMovimiento', JSON.stringify(resultado));
+    } catch {}
+    window.location.href = '/nuevo-movimiento';
   }
 
   return (
@@ -190,6 +201,10 @@ export function AnalizarDocumentoPage() {
                   </p>
                 </div>
               )}
+
+              <div>
+                <button onClick={handleConfirmEdit} className="bg-yellow-600 text-white px-3 py-1 rounded">Confirmar y editar</button>
+              </div>
 
               {resultado.categoria && (
                 <div>

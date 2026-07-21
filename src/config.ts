@@ -10,3 +10,11 @@ export function apiUrl(path: string): string {
 
   return `${apiBaseUrl.replace(/\/$/, '')}${normalizedPath}`;
 }
+
+export function authHeaders(): Record<string, string> {
+  try {
+    const token = localStorage.getItem('token');
+    if (token) return { Authorization: `Bearer ${token}` };
+  } catch {}
+  return {};
+}

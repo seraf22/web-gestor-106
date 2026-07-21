@@ -3,15 +3,46 @@ import { DollarSign, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { Chart } from '../components/Chart';
 import { MovimientosTable } from '../components/MovimientosTable';
-import { apiUrl } from '../config';
+import { apiUrl, authHeaders } from '../config';
 
 interface Movimiento {
   id: string;
   fechaMovimiento: string;
+  periodoDesde?: any;
+  periodoHasta?: any;
   tipo: string;
   categoriaNombre?: string;
   descripcion?: string;
   monto: number;
+}
+
+function parsePeriodoDate(mov: Movimiento): Date {
+  // Prefer mesDevengo, then periodoHasta, then fechaMovimiento
+  const p = (mov as any).mesDevengo ?? mov.periodoHasta ?? mov.fechaMovimiento;
+  if (!p) return new Date(0);
+
+  if (typeof p === 'string') {
+    const parsed = new Date(p);
+    if (!isNaN(parsed.getTime())) return parsed;
+    const parts = p.split('-');
+    if (parts.length >= 2) {
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      if (!isNaN(y) && !isNaN(m)) return new Date(y, m - 1, 1);
+    }
+    return new Date(p);
+  }
+
+  if (typeof p === 'object') {
+    const y = p.year ?? p.año ?? p.year;
+    const m = p.month ?? p.mes ?? p.month;
+    const d = p.day ?? p.día ?? p.day ?? 1;
+    if (y !== undefined && m !== undefined) {
+      return new Date(Date.UTC(Number(y), Number(m) - 1, Number(d || 12)));
+    }
+  }
+
+  return new Date(0);
 }
 
 interface PaginatedResponse<T> {
@@ -41,7 +72,9 @@ export function DashboardPage() {
   async function loadMovimientos() {
     setLoading(true);
     try {
-      const response = await fetch(apiUrl('/api/movimientos?page=1&pageSize=100'));
+      const response = await fetch(apiUrl('/api/movimientos?page=1&pageSize=100'), {
+        headers: authHeaders(),
+      });
       if (!response.ok) {
         throw new Error('No se pudo obtener la información de movimientos.');
       }
@@ -49,13 +82,13 @@ export function DashboardPage() {
       const data: PaginatedResponse<Movimiento> = await response.json();
       let items = data.items ?? [];
 
-      // Filtrar por mes
+      // Filtrar por mes usando periodoHasta (si existe) para determinar el mes real del movimiento
       const [year, month] = mes.split('-');
       items = items.filter((mov) => {
-        const movDate = new Date(mov.fechaMovimiento);
+        const movDate = parsePeriodoDate(mov);
         return (
-          movDate.getFullYear() === parseInt(year) &&
-          movDate.getMonth() === parseInt(month) - 1
+          movDate.getUTCFullYear() === parseInt(year) &&
+          movDate.getUTCMonth() === parseInt(month) - 1
         );
       });
 
