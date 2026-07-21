@@ -22,8 +22,8 @@ function parsePeriodoDate(mov: Movimiento): Date {
     if (m) {
       const y = Number(m[1]);
       const mo = Number(m[2]);
-      const d = m[3] ? Number(m[3]) : 1;
-      if (!isNaN(y) && !isNaN(mo)) return new Date(y, mo - 1, d);
+      const d = m[3] ? Number(m[3]) : 12; // use mid-month default to avoid timezone shifts
+      if (!isNaN(y) && !isNaN(mo)) return new Date(Date.UTC(y, mo - 1, d));
     }
     const parsed = new Date(p);
     if (!isNaN(parsed.getTime())) return parsed;
@@ -31,7 +31,7 @@ function parsePeriodoDate(mov: Movimiento): Date {
     if (parts.length >= 2) {
       const y = parseInt(parts[0], 10);
       const mm = parseInt(parts[1], 10);
-      if (!isNaN(y) && !isNaN(mm)) return new Date(y, mm - 1, 1);
+      if (!isNaN(y) && !isNaN(mm)) return new Date(Date.UTC(y, mm - 1, 12));
     }
     return new Date(p);
   }

@@ -22,13 +22,20 @@ function parsePeriodoDate(mov: Movimiento): Date {
   if (!p) return new Date(0);
 
   if (typeof p === 'string') {
+    const m = p.match(/^(\\d{4})-(\\d{2})(?:-(\\d{2}))?$/);
+    if (m) {
+      const y = Number(m[1]);
+      const mo = Number(m[2]);
+      const d = m[3] ? Number(m[3]) : 12; // use mid-month default to avoid timezone shifts
+      if (!isNaN(y) && !isNaN(mo)) return new Date(Date.UTC(y, mo - 1, d));
+    }
     const parsed = new Date(p);
     if (!isNaN(parsed.getTime())) return parsed;
     const parts = p.split('-');
     if (parts.length >= 2) {
       const y = parseInt(parts[0], 10);
-      const m = parseInt(parts[1], 10);
-      if (!isNaN(y) && !isNaN(m)) return new Date(y, m - 1, 1);
+      const mm = parseInt(parts[1], 10);
+      if (!isNaN(y) && !isNaN(mm)) return new Date(Date.UTC(y, mm - 1, 12));
     }
     return new Date(p);
   }
